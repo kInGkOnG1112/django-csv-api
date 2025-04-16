@@ -131,8 +131,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
-    # 'DEFAULT_PAGINATION_CLASS': 'utils.pagination.CustomPagination',
-    'PAGE_SIZE': 10,
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }

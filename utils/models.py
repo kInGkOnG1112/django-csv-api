@@ -12,18 +12,21 @@ class CSVModel:
 
     def _load(self):
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        csv_path = os.path.join(base_dir, "models", self.filename)
+        csv_path = os.path.join(base_dir, self.filename)
         try:
-            with open(csv_path, mode="r", newline='', encoding="utf-8") as csvfile:
+            with open(csv_path, mode="r", newline="", encoding="utf-8") as csvfile:
                 reader = csv.DictReader(csvfile)
-                self.data = [row for row in reader]
+                self.data = [
+                    {**row, "views_count": int(row["views_count"])}
+                    for row in reader
+                ]
         except FileNotFoundError:
             print(f"[ERROR] File not found: {self.filename}")
 
     def _save(self):
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         csv_path = os.path.join(base_dir, self.filename)
-        with open(csv_path, mode="w", newline='') as file:
+        with open(csv_path, mode="w", newline="", encoding="utf-8") as file:
             writer = csv.DictWriter(file, fieldnames=self.fieldnames)
             writer.writeheader()
             writer.writerows(self.data)

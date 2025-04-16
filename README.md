@@ -18,8 +18,8 @@ Follow the steps below to set up the project in your local environment:
 ### 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/your-username/your-django-csv-api.git
-cd your-django-csv-api
+git clone https://github.com/kInGkOnG1112/django-csv-api.git
+cd django-csv-api
 ```
 
 ### 2. **Install Python**

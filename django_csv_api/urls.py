@@ -26,6 +26,7 @@ from django_csv_api.views import index
 
 urlpatterns_v1 = [
     path("api/", include([
+        path("", include("app_videos.urls")),
     ])),
 ]
 

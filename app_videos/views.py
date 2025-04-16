@@ -1,11 +1,16 @@
 from utils.global_utils import id_generator
-from .serializers import VideoSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import (
     extend_schema,
-    extend_schema_view
+    extend_schema_view,
+    OpenApiParameter
+)
+from .serializers import (
+    VideoCreateSerializer,
+    VideoUpdateSerializer
 )
 from utils.models import videos
 
@@ -15,8 +20,8 @@ from utils.models import videos
 class VideosViewSet(viewsets.GenericViewSet):
     permission_classes = (AllowAny,)
     action_serializers = {
-        "create": VideoSerializer,
-        "update": VideoSerializer
+        "create": VideoCreateSerializer,
+        "update": VideoUpdateSerializer
     }
 
     def get_serializer_class(self):
@@ -25,12 +30,38 @@ class VideosViewSet(viewsets.GenericViewSet):
                 return self.action_serializers[self.action]
         return super(VideosViewSet, self).get_serializer_class()
 
-    @extend_schema(summary="Get the list of videos")
+    @extend_schema(
+        summary="Get all video records, with support for sorting",
+        parameters=list([
+            OpenApiParameter(
+                name="sort_by",
+                location=OpenApiParameter.QUERY,
+                type=OpenApiTypes.STR,
+                required=False,
+                default="name",
+            ),
+            OpenApiParameter(
+                name="order",
+                location=OpenApiParameter.QUERY,
+                type=OpenApiTypes.STR,
+                required=False,
+                default="asc",
+            )
+        ]),
+    )
     def list(self, request):
+        data = request.GET
+        sort_by = data.get("sort_by")
+        order = data.get("order", "asc")
         all_data = videos.all()
+
+        if sort_by and sort_by in ["name", "post_date", "views_count"]:
+            reverse = True if order.lower() == "desc" else False
+            all_data = sorted(all_data, key=lambda x: x[sort_by], reverse=reverse)
+
         return Response(all_data)
 
-    @extend_schema(summary="Create new video")
+    @extend_schema(summary="Add a new video record")
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
@@ -50,7 +81,7 @@ class VideosViewSet(viewsets.GenericViewSet):
         return Response({"message": "Video was successfully created!"}, 
                         status=status.HTTP_201_CREATED)
 
-    @extend_schema(summary="Update existing video")
+    @extend_schema(summary="Update an existing video record")
     def update(self, request, pk=None):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
@@ -69,7 +100,7 @@ class VideosViewSet(viewsets.GenericViewSet):
         return Response({"message": "Video was successfully updated!"}, 
                         status=status.HTTP_200_OK)
 
-    @extend_schema(summary="Remove existing video")
+    @extend_schema(summary="Delete a video record by ID")
     def destroy(self, request, pk=None):
         video = videos.filter(lambda row: row["id"] == pk)
         if not video:

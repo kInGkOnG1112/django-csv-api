@@ -8,7 +8,7 @@ optional = {
 }
 
 
-class VideoSerializer(serializers.Serializer):
+class BaseVideoSerializer(serializers.Serializer):
 
     name = serializers.CharField(max_length=2000)
     href = serializers.CharField(max_length=3000)
@@ -22,9 +22,20 @@ class VideoSerializer(serializers.Serializer):
         errors = dict()
         post_date = attrs.get("post_date")
 
-        if not is_valid_date(post_date):
+        if post_date and not is_valid_date(post_date):
             errors["post_date"] = "Invalid date format! It should be MM/DD/YYYY."
 
         if errors:
             raise serializers.ValidationError(errors)
         return attrs
+
+
+class VideoCreateSerializer(BaseVideoSerializer):
+    pass
+
+
+class VideoUpdateSerializer(BaseVideoSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = False

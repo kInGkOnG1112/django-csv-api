@@ -22,7 +22,7 @@ class CSVModel:
 
     def _save(self):
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        csv_path = os.path.join(base_dir, "models", self.filename)
+        csv_path = os.path.join(base_dir, self.filename)
         with open(csv_path, mode="w", newline='') as file:
             writer = csv.DictWriter(file, fieldnames=self.fieldnames)
             writer.writeheader()
@@ -54,5 +54,5 @@ class CSVModel:
         return self.data
 
 
-fields = ["id", "href", "name", "post_date", 'views_count']
-videos = CSVModel('videos.csv', fields)
+fields = ["id", "name", "href", "post_date", "views_count"]
+videos = CSVModel("videos.csv", fields)
